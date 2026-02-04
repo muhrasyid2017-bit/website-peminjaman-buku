@@ -1,0 +1,442 @@
+﻿<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Perpustakaan SMK Peminjaman</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="brand">
+          <div class="logo">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
+              width="60"
+              height="60"
+            >
+              <defs>
+                <linearGradient
+                  id="logoGrad"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop
+                    offset="0%"
+                    style="stop-color: #6366f1; stop-opacity: 1"
+                  />
+                  <stop
+                    offset="100%"
+                    style="stop-color: #0ea5e9; stop-opacity: 1"
+                  />
+                </linearGradient>
+              </defs>
+              <circle
+                cx="50"
+                cy="50"
+                r="48"
+                fill="url(#logoGrad)"
+                opacity="0.15"
+                stroke="url(#logoGrad)"
+                stroke-width="2"
+              />
+              <g transform="translate(50, 50)">
+                <path
+                  d="M -20 -20 L -20 5 Q 0 22 20 28 Q 0 22 0 28 Q -20 22 -20 5 Z"
+                  fill="#0ea5e9"
+                  opacity="0.15"
+                  stroke="#0ea5e9"
+                  stroke-width="2.5"
+                  stroke-linejoin="round"
+                />
+                <g transform="translate(-6, -8)">
+                  <rect
+                    x="0"
+                    y="2"
+                    width="12"
+                    height="18"
+                    rx="1"
+                    stroke="#06b6d4"
+                    stroke-width="2"
+                    fill="none"
+                  />
+                  <line
+                    x1="6"
+                    y1="2"
+                    x2="6"
+                    y2="20"
+                    stroke="#06b6d4"
+                    stroke-width="1.5"
+                  />
+                  <line
+                    x1="1"
+                    y1="6"
+                    x2="11"
+                    y2="6"
+                    stroke="#ffffff"
+                    stroke-width="1"
+                    opacity="0.6"
+                  />
+                  <line
+                    x1="1"
+                    y1="10"
+                    x2="11"
+                    y2="10"
+                    stroke="#ffffff"
+                    stroke-width="1"
+                    opacity="0.6"
+                  />
+                  <line
+                    x1="1"
+                    y1="14"
+                    x2="11"
+                    y2="14"
+                    stroke="#ffffff"
+                    stroke-width="1"
+                    opacity="0.6"
+                  />
+                </g>
+                <circle
+                  cx="-12"
+                  cy="-12"
+                  r="2.5"
+                  fill="#06b6d4"
+                  opacity="0.8"
+                />
+                <circle cx="12" cy="-12" r="2.5" fill="#06b6d4" opacity="0.8" />
+              </g>
+            </svg>
+          </div>
+          <div>
+            <div class="title">SMKN 1 MURUNG PUDAK</div>
+            <div class="subtitle">Perpustakaan Digital SMKN 1 MURUNG PUDAK</div>
+          </div>
+        </div>
+        <div class="controls">
+          <input
+            id="search"
+            class="input"
+            placeholder="Cari judul atau penulis"
+          />
+          <button class="btn" onclick="openLoanForm()">
+            Tambah Peminjaman
+          </button>
+          <button
+            class="btn secondary"
+            onclick="openAddBookForm()"
+            title="Tambah buku baru"
+            id="addBookBtn"
+          >
+            + Buku
+          </button>
+          <button
+            class="btn secondary"
+            onclick="openAdminLogin()"
+            title="Login Admin"
+            id="adminLoginBtn"
+          >
+            🔐 Admin Login
+          </button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Daftar Buku</h3>
+          <div id="bookList" class="book-list mt-1"></div>
+          <div class="footer-note">
+            Menampilkan buku yang tersedia dan stok saat ini.
+          </div>
+        </div>
+        <div class="card">
+          <h3>Riwayat Peminjaman</h3>
+          <div style="overflow-x: auto;">
+            <table class="table mt-1">
+              <thead>
+                <tr>
+                  <th style="width: 20%">Peminjam</th>
+                  <th style="width: 25%">Judul Buku</th>
+                  <th style="width: 12%">Tgl. Pinjam</th>
+                  <th style="width: 20%">Batas Kembali</th>
+                  <th style="width: 12%">Status</th>
+                  <th style="width: 11%">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="loansBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Form Peminjaman -->
+    <div id="modal" class="modal" role="dialog" aria-modal="true">
+      <div class="panel">
+        <h3>Buat Peminjaman</h3>
+        <form id="loanForm">
+          <div class="mt-1">
+            <label class="label">Pilih Buku</label>
+            <select id="loanBook" class="input"></select>
+          </div>
+          <div class="mt-1 form-row">
+            <div style="flex: 2">
+              <label class="label">Nama Peminjam</label>
+              <input id="loanName" class="input" placeholder="Nama lengkap" />
+            </div>
+            <div style="flex: 1">
+              <label class="label">Tanggal</label>
+              <input id="loanDate" class="input" type="date" />
+            </div>
+          </div>
+          <div class="mt-1">
+            <label class="label">Durasi Peminjaman (hari)</label>
+            <select id="loanDuration" class="input">
+              <option value="7">7 hari</option>
+              <option value="14">14 hari</option>
+              <option value="21">21 hari</option>
+              <option value="30">30 hari</option>
+            </select>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-top: 0.75rem;
+              justify-content: flex-end;
+            "
+          >
+            <button type="button" id="closeModal" class="btn secondary">
+              Batal
+            </button>
+            <button type="submit" class="btn">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Admin Login -->
+    <div id="modalAdminLogin" class="modal" role="dialog" aria-modal="true">
+      <div class="panel" style="max-width: 400px">
+        <h3>🔐 Login Admin</h3>
+        <form id="adminLoginForm">
+          <div class="mt-1">
+            <label class="label">Username Admin</label>
+            <input
+              id="adminUsername"
+              class="input"
+              placeholder="Masukkan username admin"
+              required
+            />
+          </div>
+          <div class="mt-1">
+            <label class="label">Password</label>
+            <input
+              id="adminPassword"
+              class="input"
+              type="password"
+              placeholder="Masukkan password"
+              required
+            />
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-top: 0.75rem;
+              justify-content: flex-end;
+            "
+          >
+            <button
+              type="button"
+              id="closeAdminLoginModal"
+              class="btn secondary"
+            >
+              Batal
+            </button>
+            <button type="submit" class="btn">Login</button>
+          </div>
+        </form>
+        <div
+          id="adminStatusDiv"
+          style="
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: #ecfdf5;
+            border-radius: 8px;
+            display: none;
+          "
+        >
+          <p
+            id="adminStatusText"
+            style="margin: 0; color: #059669; font-weight: 600"
+          ></p>
+          <button
+            type="button"
+            onclick="logoutAdmin()"
+            class="btn secondary"
+            style="margin-top: 0.5rem; width: 100%"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Form Tambah Buku -->
+    <div id="modalBook" class="modal" role="dialog" aria-modal="true">
+      <div class="panel">
+        <h3>Tambah Buku Baru</h3>
+        <form id="bookForm">
+          <div class="mt-1">
+            <label class="label">Judul Buku</label>
+            <input
+              id="bookTitle"
+              class="input"
+              placeholder="Masukkan judul buku"
+              required
+            />
+          </div>
+          <div class="mt-1">
+            <label class="label">Penulis</label>
+            <input
+              id="bookAuthor"
+              class="input"
+              placeholder="Nama penulis"
+              required
+            />
+          </div>
+          <div class="mt-1">
+            <label class="label">Jumlah Salinan</label>
+            <input
+              id="bookCopies"
+              class="input"
+              type="number"
+              min="1"
+              value="1"
+              required
+            />
+          </div>
+          <div class="mt-1 form-row">
+            <div style="flex: 1">
+              <label class="label">Tahun Terbit</label>
+              <input id="bookYear" class="input" type="number" min="2000" />
+            </div>
+            <div style="flex: 1">
+              <label class="label">ISBN</label>
+              <input
+                id="bookISBN"
+                class="input"
+                placeholder="978-602-xxx-xxx-x"
+              />
+            </div>
+          </div>
+          <div class="mt-1">
+            <label class="label">URL Gambar Buku</label>
+            <input
+              id="bookImage"
+              class="input"
+              type="url"
+              placeholder="https://contoh.com/gambar.jpg"
+            />
+            <small style="color: #9aa4b2"
+              >Gunakan URL gambar dari web atau biarkan kosong</small
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-top: 0.75rem;
+              justify-content: flex-end;
+            "
+          >
+            <button type="button" id="closeBookModal" class="btn secondary">
+              Batal
+            </button>
+            <button type="submit" class="btn">Simpan Buku</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Form Edit Buku -->
+    <div id="modalEditBook" class="modal" role="dialog" aria-modal="true">
+      <div class="panel">
+        <h3>Edit Buku</h3>
+        <form id="editBookForm">
+          <input id="editBookId" type="hidden" />
+          <div class="mt-1">
+            <label class="label">Judul Buku</label>
+            <input
+              id="editBookTitle"
+              class="input"
+              placeholder="Masukkan judul buku"
+              required
+            />
+          </div>
+          <div class="mt-1">
+            <label class="label">Penulis</label>
+            <input
+              id="editBookAuthor"
+              class="input"
+              placeholder="Nama penulis"
+              required
+            />
+          </div>
+          <div class="mt-1 form-row">
+            <div style="flex: 1">
+              <label class="label">Jumlah Salinan</label>
+              <input
+                id="editBookCopies"
+                class="input"
+                type="number"
+                min="1"
+                required
+              />
+            </div>
+            <div style="flex: 1">
+              <label class="label">Tahun Terbit</label>
+              <input id="editBookYear" class="input" type="number" min="2000" />
+            </div>
+          </div>
+          <div class="mt-1">
+            <label class="label">ISBN</label>
+            <input
+              id="editBookISBN"
+              class="input"
+              placeholder="978-602-xxx-xxx-x"
+            />
+          </div>
+          <div class="mt-1">
+            <label class="label">URL Gambar Buku</label>
+            <input
+              id="editBookImage"
+              class="input"
+              type="url"
+              placeholder="https://contoh.com/gambar.jpg"
+            />
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-top: 0.75rem;
+              justify-content: flex-end;
+            "
+          >
+            <button type="button" id="closeEditBookModal" class="btn secondary">
+              Batal
+            </button>
+            <button type="submit" class="btn">Perbarui Buku</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
